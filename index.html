@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Siber Güvenlik Atölyesi · Kali Linux Komut Rehberi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#f5f7fa;--panel:#fff;--panel2:#eef2f6;--text:#16202c;--muted:#5b6b7d;--line:#d9e0e8;--accent:#0a6dc2;--warn:#a65b00;--warnbg:#fff4e0;--atk:#b23a2e;--atkbg:#fdeceb;--atkline:#e4b3ad;--def:#1c7a52;--defbg:#eaf7f1;--defline:#a9d9c3;--code:#0f1a26;--codetx:#d8e6f5;--prompt:#f2b134;--hd:rgba(245,247,250,.92);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b121b;--panel:#121c28;--panel2:#16212e;--text:#e3ebf4;--muted:#8fa2b6;--line:#223245;--accent:#58b4ff;--warn:#f2b134;--warnbg:#2a2110;--atk:#e8786a;--atkbg:#2a1715;--atkline:#5a2e28;--def:#5fd1a3;--defbg:#102520;--defline:#1d4a3a;--code:#070d14;--hd:rgba(11,18,27,.92)}}
+:root[data-theme="dark"]{--bg:#0b121b;--panel:#121c28;--panel2:#16212e;--text:#e3ebf4;--muted:#8fa2b6;--line:#223245;--accent:#58b4ff;--warn:#f2b134;--warnbg:#2a2110;--atk:#e8786a;--atkbg:#2a1715;--atkline:#5a2e28;--def:#5fd1a3;--defbg:#102520;--defline:#1d4a3a;--code:#070d14;--hd:rgba(11,18,27,.92)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--hd);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--hd);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);transition:box-shadow .25s}
+header.scrolled{box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.bar{max-width:1180px;margin:auto;padding:12px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.logo{font:600 15px "JetBrains Mono",monospace;margin-right:auto}
+.logo b{color:var(--prompt)}
+nav{display:flex;gap:16px;font-size:13.5px;overflow-x:auto}
+nav a{color:var(--muted);text-decoration:none;white-space:nowrap}nav a:hover,nav a.on{color:var(--accent)}
+button{font:inherit;cursor:pointer}
+#theme{background:none;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:3px 10px;font-size:13px}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:auto;padding:0 20px 70px;display:grid;grid-template-columns:200px 1fr;gap:36px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);align-self:start;padding-top:42px;font-size:13.5px}
+.side a{display:block;color:var(--muted);text-decoration:none;padding:5px 0;border-left:2px solid transparent;padding-left:12px}
+.side a:hover,.side a.on{color:var(--accent);border-color:var(--accent)}
+main{min-width:0}
+.hero{padding:44px 0 30px}
+.hero h1{font-size:clamp(28px,5vw,48px);line-height:1.08;margin:0 0 14px;letter-spacing:-.02em;max-width:18ch}
+.hero p{color:var(--muted);max-width:62ch;margin:0}
+.term{margin-top:24px;background:var(--code);color:var(--codetx);border-radius:10px;padding:16px 18px;font:14px/1.7 "JetBrains Mono",monospace;overflow-x:auto;max-width:640px}
+.term i{color:var(--prompt);font-style:normal}.term span{color:#7d93ab}
+.outline{opacity:0;transition:opacity .5s ease}
+.outline.show{opacity:1}
+#caret{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){#caret{animation:none}}
+.hero{opacity:0;transform:translateY(8px);animation:rise .6s ease forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+section{padding-top:50px}
+h2{font-size:25px;margin:0 0 6px;letter-spacing:-.01em;scroll-margin-top:70px}
+.sub{color:var(--muted);margin:0 0 22px;max-width:70ch}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.card h3{margin:0 0 6px;font-size:16px}.card p{margin:0;font-size:14px;color:var(--muted)}
+.road{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:34px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.step:last-child{border-bottom:1px solid var(--line)}
+.step em{font:600 14px "JetBrains Mono",monospace;color:var(--accent);font-style:normal}
+.step h3{margin:0 0 3px;font-size:16px}.step p{margin:0;font-size:14px;color:var(--muted);max-width:60ch}
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--panel2);font-weight:600;font-size:13px;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.tscroll{overflow-x:auto}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media (max-width:760px){.pair{grid-template-columns:1fr}}
+.atk,.def{border-radius:8px;padding:15px 17px;border:1px solid var(--line)}
+.atk{background:var(--atkbg);border-color:var(--atkline)}
+.def{background:var(--defbg);border-color:var(--defline)}
+.lbl{display:inline-block;font-size:11.5px;font-weight:600;letter-spacing:.02em;margin-bottom:6px}
+.atk .lbl{color:var(--atk)}.def .lbl{color:var(--def)}
+.atk h3,.def h3{margin:0 0 6px;font-size:16px}
+.atk p,.def p{margin:0;font-size:14px;color:var(--text);opacity:.88}
+.warn{background:var(--warnbg);border:1px solid var(--warn);color:var(--text);border-radius:6px;padding:14px 16px;font-size:15px;margin-bottom:18px}
+.warn strong{color:var(--warn)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+#q{flex:1 1 240px;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:6px;padding:9px 12px;font:inherit}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:6px 14px;font-size:13.5px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.count{color:var(--muted);font-size:13px;margin:0 0 14px}
+.cmd{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:14px;overflow:hidden}
+.cmd .head{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:14px 16px 0}
+.cmd h3{margin:0;font-size:17px;font-family:"JetBrains Mono",monospace}
+.tag{font-size:12px;color:var(--muted);white-space:nowrap}
+.cmd>p{margin:4px 16px 10px;color:var(--muted);font-size:14.5px}
+.flags{margin:0 16px 12px;padding:0;list-style:none;font-size:13px;color:var(--muted)}
+.flags li{padding:2px 0}
+.flags b{font-family:"JetBrains Mono",monospace;color:var(--accent);font-weight:600;margin-right:6px}
+.code{position:relative;background:var(--code);color:var(--codetx);margin:0;padding:14px 76px 14px 16px;font:13.5px/1.6 "JetBrains Mono",monospace;overflow-x:auto;white-space:pre}
+.code+.code{border-top:1px solid #1d2b3b}
+.code::before{content:"$ ";color:var(--prompt)}
+.copy{position:absolute;right:10px;top:10px;background:#1b2a3b;border:0;color:#b9cbe0;font-size:12px;border-radius:4px;padding:3px 9px}
+.copy:hover{background:#25394f}
+.note{display:block;padding:8px 16px 14px;font-size:13.5px;color:var(--muted)}
+.empty{color:var(--muted);padding:30px 0;text-align:center}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.res div{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;font-size:14px}
+.res b{display:block;margin-bottom:2px}
+.gloss{display:grid;gap:8px}
+.gloss details{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+.gloss summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gloss summary::-webkit-details-marker{display:none}
+.gloss summary::after{content:"+";color:var(--accent);font-weight:400;font-size:19px;flex:none}
+.gloss details[open] summary::after{content:"–"}
+.gloss details p{margin:10px 0 0;color:var(--muted);font-size:14px}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:24px 20px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}.side{display:none}}
+@media (max-width:640px){header nav{display:none}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+<div class="logo"><b>root@kali</b>:~# siber-atölye</div>
+<nav id="topnav">
+<a href="#temeller">Temeller</a><a href="#ag">Ağ</a><a href="#saldiri">Saldırılar</a><a href="#cerceveler">Çerçeveler</a><a href="#yuktest">Yük testi</a><a href="#komutlar">Komutlar</a><a href="#sozluk">Sözlük</a><a href="#lab">Lab</a>
+</nav>
+<button id="theme" type="button" aria-label="Temayı değiştir">Tema</button>
+</div></header>
+
+<div class="wrap">
+<aside class="side" id="sidenav">
+<a href="#temeller">Temeller</a><a href="#ag">Ağ ve bağlantı</a><a href="#saldiri">Saldırı / korunma</a><a href="#cerceveler">Çerçeveler ve IR</a><a href="#yuktest">Kontrollü yük testi</a><a href="#komutlar">Kali komutları</a><a href="#etik">Etik</a><a href="#sozluk">Sözlük</a><a href="#lab">Lab kurulumu</a>
+</aside>
+<main>
+<section class="hero">
+<h1>Siber güvenliği uçtan uca, komut satırından öğren.</h1>
+<p>Temel kavramlardan ağ mimarisine, saldırı/korunma eşleşmelerinden kontrollü yük testine ve Kali Linux komutlarının bayrak bayrak açıklamasına uzanan tek sayfalık bir rehber.</p>
+<div class="term" id="term"><i>$</i> <span id="typecmd"></span><span id="caret">▌</span><br><span id="out1" class="outline">22/tcp open  ssh   OpenSSH 8.9</span><br><span id="out2" class="outline">80/tcp open  http  Apache 2.4.52</span></div>
+</section>
+
+<section id="temeller">
+<h2>Siber güvenliğin temelleri</h2>
+<p class="sub">Her araç ve teknik, aşağıdaki birkaç ilkenin üzerine kurulur.</p>
+<div class="grid3">
+<div class="card"><h3>Gizlilik</h3><p>Bilgiye yalnızca yetkili kişilerin erişebilmesi. Şifreleme ve erişim kontrolüyle sağlanır.</p></div>
+<div class="card"><h3>Bütünlük</h3><p>Verinin izinsiz değiştirilmediğinin garantisi. Hash’ler ve dijital imzalar bunu doğrular.</p></div>
+<div class="card"><h3>Erişilebilirlik</h3><p>Sistemin ihtiyaç duyulduğunda çalışır olması. Yedeklilik ve DDoS savunması bu amaca hizmet eder.</p></div>
+<div class="card"><h3>Kimlik doğrulama</h3><p>Birinin iddia ettiği kişi olduğunun kanıtlanması: parola, biyometrik, donanım anahtarı.</p></div>
+<div class="card"><h3>Yetkilendirme</h3><p>Doğrulanmış kimliğin neyi yapabileceğinin sınırlanması; en az ayrıcalık ilkesi.</p></div>
+<div class="card"><h3>İzlenebilirlik</h3><p>Kim, ne zaman, neyi yaptı sorusuna cevap veren loglama ve denetim izleri.</p></div>
+</div>
+<h3 style="margin:30px 0 10px;font-size:18px">Öğrenme yol haritası</h3>
+<div class="road">
+<div class="step"><em>01</em><div><h3>Linux ve terminal</h3><p>Dosya sistemi, izinler, süreçler, paket yönetimi, temel bash betikleri.</p></div></div>
+<div class="step"><em>02</em><div><h3>Ağ temelleri</h3><p>TCP/IP katmanları, portlar, protokoller. Wireshark ile gerçek trafiği oku.</p></div></div>
+<div class="step"><em>03</em><div><h3>Keşif ve tarama</h3><p>Açık kaynak istihbaratı, port taraması, servis/sürüm tespiti.</p></div></div>
+<div class="step"><em>04</em><div><h3>Saldırı ve savunma mantığı</h3><p>Yaygın saldırı türlerini ve her birine karşılık gelen savunmayı öğren.</p></div></div>
+<div class="step"><em>05</em><div><h3>Web güvenliği</h3><p>OWASP Top 10: enjeksiyon, XSS, kırık erişim kontrolü, kimlik doğrulama hataları.</p></div></div>
+<div class="step"><em>06</em><div><h3>Pratik ve sertifikasyon</h3><p>CTF’ler, Hack The Box, TryHackMe; ardından Security+, eJPT, OSCP gibi hedefler.</p></div></div>
+</div>
+</section>
+
+<section id="ag">
+<h2>Ağ ve bağlantı temelleri</h2>
+<p class="sub">Bir saldırının veya savunmanın nerede gerçekleştiğini anlamak için katman modelini bilmek gerekir.</p>
+<div class="tscroll"><table><thead><tr><th>Katman</th><th>Görevi</th><th>Örnek</th></tr></thead><tbody>
+<tr><td>Uygulama</td><td>Kullanıcıya en yakın katman; veriyi anlamlı hale getirir</td><td>HTTP, DNS, SSH</td></tr>
+<tr><td>Taşıma</td><td>Uçtan uca iletim, bağlantı yönetimi</td><td>TCP (güvenilir), UDP (hızlı)</td></tr>
+<tr><td>İnternet</td><td>Paketlerin ağlar arası yönlendirilmesi</td><td>IP, ICMP</td></tr>
+<tr><td>Bağlantı</td><td>Fiziksel ortamda çerçeve iletimi</td><td>Ethernet, Wi-Fi, ARP</td></tr>
+</tbody></table></div>
+<h3 style="margin:26px 0 10px;font-size:18px">Sık kullanılan portlar</h3>
+<div class="tscroll"><table><thead><tr><th>Port</th><th>Protokol</th><th>Neden önemli</th></tr></thead><tbody>
+<tr><td>22</td><td>SSH</td><td>Uzak yönetim; zayıf parolalarla brute-force hedefi</td></tr>
+<tr><td>80 / 443</td><td>HTTP / HTTPS</td><td>Web uygulamaları; en geniş saldırı yüzeyi</td></tr>
+<tr><td>53</td><td>DNS</td><td>İsim çözümleme; zehirleme ve tünelleme hedefi olabilir</td></tr>
+<tr><td>445</td><td>SMB</td><td>Dosya paylaşımı; birçok solucanın yayılma yolu</td></tr>
+<tr><td>3389</td><td>RDP</td><td>Uzak masaüstü; internete açık bırakılırsa yüksek risk</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="saldiri">
+<h2>Saldırı türleri ve korunma yöntemleri</h2>
+<p class="sub">Her saldırının altında, onu etkisiz kılan bir savunma mantığı gösterilmiştir.</p>
+<div id="pairs"></div>
+</section>
+
+<section id="cerceveler">
+<h2>Güvenlik çerçeveleri ve olay müdahalesi</h2>
+<p class="sub">Kurumsal güvenlik, tek bir araçtan değil; tanınmış çerçevelere dayanan süreçlerden güç alır.</p>
+<div class="grid3">
+<div class="card"><h3>NIST CSF</h3><p>Identify, Protect, Detect, Respond, Recover beş fonksiyonuyla risk yönetimine ortak bir dil kazandırır.</p></div>
+<div class="card"><h3>ISO/IEC 27001</h3><p>Bilgi güvenliği yönetim sistemi (ISMS) kurmak için uluslararası sertifikasyon standardı.</p></div>
+<div class="card"><h3>OWASP Top 10</h3><p>Web uygulamalarındaki en kritik on risk kategorisi; geliştirici ve test ekiplerinin ortak referansı.</p></div>
+<div class="card"><h3>CIS Controls</h3><p>Önceliklendirilmiş, doğrudan uygulanabilir güvenlik önlemlerinden oluşan pratik kontrol listesi.</p></div>
+</div>
+<h3 style="margin:30px 0 10px;font-size:18px">Olay müdahale yaşam döngüsü</h3>
+<div class="road">
+<div class="step"><em>01</em><div><h3>Hazırlık</h3><p>Politika, araç ve ekiplerin bir olay yaşanmadan önce hazır hale getirilmesi.</p></div></div>
+<div class="step"><em>02</em><div><h3>Tespit ve analiz</h3><p>Anormal davranışın log ve uyarılarla fark edilip doğrulanması.</p></div></div>
+<div class="step"><em>03</em><div><h3>Sınırlama</h3><p>Etkilenen sistemleri ağdan izole ederek yayılmayı durdurma.</p></div></div>
+<div class="step"><em>04</em><div><h3>Ortadan kaldırma</h3><p>Kötü amaçlı yazılımın ve kök nedenin sistemden tamamen temizlenmesi.</p></div></div>
+<div class="step"><em>05</em><div><h3>Kurtarma</h3><p>Sistemlerin izlenerek kontrollü biçimde yeniden üretime alınması.</p></div></div>
+<div class="step"><em>06</em><div><h3>Çıkarılan dersler</h3><p>Olayın belgelenmesi ve sürecin gelecekteki olaylar için iyileştirilmesi.</p></div></div>
+</div>
+</section>
+
+<section id="yuktest">
+<h2>Kontrollü yük testleri</h2>
+<p class="sub">Yük/stres testi, bir sistemin kapasite sınırını ölçmek için kendi altyapında uyguladığın kontrollü bir yöntemdir — DDoS saldırısıyla karıştırılmamalıdır.</p>
+<div class="warn"><strong>Yalnızca sahibi olduğun veya yazılı izin aldığın sistemlerde çalıştır.</strong> Başka birinin altyapısına yüksek hacimli trafik göndermek, izin olsa bile önceden planlanmalı; izinsizse DDoS suçuna girer.</div>
+<div class="cmd"><div class="head"><h3>ab (Apache Bench)</h3><span class="tag">HTTP yük testi</span></div>
+<p>Bir web sunucusuna eş zamanlı istek göndererek saniyedeki istek kapasitesini ölçer.</p>
+<ul class="flags"><li><b>-n</b> toplam istek sayısı</li><li><b>-c</b> eşzamanlı bağlantı sayısı</li></ul>
+<pre class="code">ab -n 1000 -c 50 http://192.168.56.101/<button class="copy" type="button">Kopyala</button></pre>
+<span class="note">Çıktıdaki "Requests per second" değeri sunucunun kapasite tavanını gösterir.</span></div>
+<div class="cmd"><div class="head"><h3>hping3</h3><span class="tag">Paket düzeyinde test</span></div>
+<p>Özel TCP/UDP/ICMP paketleri üretip gönderir; güvenlik duvarı ve IDS davranışını da gözlemlemeye yarar.</p>
+<ul class="flags"><li><b>-S</b> SYN bayrağı gönder</li><li><b>-p</b> hedef port</li><li><b>--flood</b> olabildiğince hızlı gönder (yalnızca kendi lab’ında)</li></ul>
+<pre class="code">sudo hping3 -S -p 80 --flood 192.168.56.101<button class="copy" type="button">Kopyala</button></pre>
+<span class="note">Flood modu agresiftir; yalnızca izole lab ağında ve kısa süreli kullan.</span></div>
+<div class="cmd"><div class="head"><h3>siege</h3><span class="tag">Eşzamanlı kullanıcı simülasyonu</span></div>
+<p>Çok sayıda sanal kullanıcının aynı anda siteyi ziyaret etmesini simüle eder; hata oranını raporlar.</p>
+<ul class="flags"><li><b>-c</b> eşzamanlı kullanıcı sayısı</li><li><b>-t</b> test süresi</li></ul>
+<pre class="code">siege -c 25 -t 30S http://192.168.56.101/<button class="copy" type="button">Kopyala</button></pre>
+<span class="note">"Availability" değeri %99’un altına düşerse sunucu kapasiteyi zorluyor demektir.</span></div>
+</section>
+
+<section id="komutlar">
+<h2>Kali Linux komut rehberi</h2>
+<p class="sub">Kategori seç veya ara. Her komutun bayrakları ayrı ayrı açıklanmıştır; IP adreslerini kendi lab ortamınla değiştir.</p>
+<div class="tools"><input id="q" type="search" placeholder="Komut, bayrak veya araç ara (ör. nmap, -sV, grep)" aria-label="Komut ara"></div>
+<div class="chips" id="chips" role="group" aria-label="Kategoriler"></div>
+<p class="count" id="count"></p>
+<div id="list"></div>
+</section>
+
+<section id="etik">
+<h2>Etik ve yasal çerçeve</h2>
+<div class="warn"><strong>Yalnızca izinli sistemlerde kullan.</strong> Sahibi olmadığın ya da yazılı izin almadığın bir sisteme tarama, parola denemesi, yük testi veya sızma girişimi yapmak Türkiye’de TCK 243–245 kapsamında suçtur ve diğer ülkelerde de benzer şekilde yasaktır. Pratik için kendi sanal laboratuvarını, CTF platformlarını ve bilerek zafiyetli bırakılmış makineleri kullan.</div>
+</section>
+
+<section id="sozluk">
+<h2>Terimler sözlüğü</h2>
+<p class="sub">Sık karşılaşacağın terimlerin kısa açıklamaları.</p>
+<div class="gloss">
+<details><summary>Zafiyet (Vulnerability)</summary><p>Bir sistemde saldırganın istismar edebileceği zayıflık veya tasarım hatası.</p></details>
+<details><summary>İstismar (Exploit)</summary><p>Bir zafiyeti kullanarak sisteme yetkisiz erişim sağlayan kod veya yöntem.</p></details>
+<details><summary>Sıfır gün (Zero-day)</summary><p>Üreticinin henüz farkında olmadığı veya yama yayınlamadığı zafiyet.</p></details>
+<details><summary>Saldırı yüzeyi</summary><p>Bir sistemin saldırıya açık tüm giriş noktalarının toplamı.</p></details>
+<details><summary>IOC (ele geçirilme göstergesi)</summary><p>Bir sistemin ele geçirildiğine işaret eden iz: anormal IP, dosya hash’i, kullanıcı davranışı.</p></details>
+<details><summary>Red Team / Blue Team</summary><p>Red Team saldırıyı simüle eder; Blue Team bu saldırıları tespit edip savunmayı yürütür.</p></details>
+<details><summary>SOC / SIEM</summary><p>SOC güvenlik olaylarını izleyen ekiptir; SIEM bu olayları toplayıp ilişkilendiren sistemdir.</p></details>
+<details><summary>Honeypot</summary><p>Saldırganları çekmek ve davranışlarını güvenle gözlemlemek için kurulan tuzak sistem.</p></details>
+</div>
+</section>
+
+<section id="lab">
+<h2>Güvenli lab kurulumu</h2>
+<p class="sub">Denemelerini gerçek ağlardan ayır.</p>
+<div class="res">
+<div><b>VirtualBox / VMware</b>Kali’yi ve hedef makineleri sanal makine olarak çalıştır; "Host-only" ağ kullan.</div>
+<div><b>Metasploitable 2/3</b>Bilerek zafiyetli Linux hedefi; tarama ve servis analizi için ideal.</div>
+<div><b>DVWA ve OWASP Juice Shop</b>Zafiyetli web uygulamaları; web testlerini güvenle dene.</div>
+<div><b>TryHackMe, Hack The Box</b>Rehberli odalar ve yasal CTF ortamları.</div>
+</div>
+</section>
+</main>
+</div>
+<footer>Eğitim amaçlıdır. Komutları ve yük testlerini yalnızca yetkili olduğun sistemlerde çalıştır.</footer>
+
+<script>
+var PAIRS=[
+["Oltalama (Phishing)","Gerçek bir kurumu taklit eden e-posta veya sahte sayfayla kullanıcıdan parola ya da kart bilgisi çekilir.","E-posta doğrulama (SPF/DKIM/DMARC), çalışan farkındalık eğitimi, bağlantı önizleme ve çok faktörlü doğrulama."],
+["Ortadaki adam (MITM)","Saldırgan iki taraf arasındaki trafiği gizlice dinler veya değiştirir, genelde açık Wi-Fi’da.","HTTPS/TLS zorunluluğu, sertifika pinleme, VPN kullanımı ve ARP izleme araçları."],
+["Hizmet dışı bırakma (DDoS)","Çok sayıda kaynaktan hedefe aşırı trafik gönderilerek servis kullanılamaz hale getirilir.","Hız sınırlama, CDN/anti-DDoS hizmeti, trafik desenlerini izleyen anomali tespiti."],
+["SQL enjeksiyonu","Kullanıcı girdisi doğrudan veritabanı sorgusuna eklenirse saldırgan sorguyu değiştirebilir.","Parametreli sorgular (prepared statements), girdi doğrulama, en az ayrıcalıklı veritabanı hesabı."],
+["Siteler arası betik (XSS)","Sayfaya enjekte edilen betik, diğer kullanıcıların tarayıcısında çalışır; oturum çalmak için kullanılır.","Çıktı kaçışlama (output encoding), İçerik Güvenlik Politikası (CSP), girdi doğrulama."],
+["Fidye yazılımı","Sisteme sızan kötü amaçlı yazılım dosyaları şifreler ve fidye talep eder.","Düzenli ve izole yedekleme, uç nokta koruması, yama yönetimi, e-posta eki filtreleme."],
+["Kaba kuvvet (Brute force)","Doğru parolayı bulana kadar çok sayıda kombinasyon otomatik olarak denenir.","Hesap kilitleme, oran sınırlama, güçlü parola politikası, çok faktörlü doğrulama."],
+["Yetki yükseltme","Saldırgan düşük yetkili bir hesaptan sistem yöneticisi düzeyine çıkmaya çalışır.","En az ayrıcalık ilkesi, düzenli yama, SUID/izin denetimi, ayrıcalıklı erişim izleme."]
+];
+var pc=document.getElementById("pairs");
+PAIRS.forEach(function(r){
+ var d=document.createElement("div");d.className="pair";
+ d.innerHTML='<div class="atk"><span class="lbl">SALDIRI</span><h3>'+r[0]+'</h3><p>'+r[1]+'</p></div><div class="def"><span class="lbl">KORUNMA</span><h3>Nasıl engellenir</h3><p>'+r[2]+'</p></div>';
+ pc.appendChild(d);
+});
+
+var CATS=["Tümü","Linux temelleri","Ağ ve tarama","Keşif (OSINT)","Web testleri","Parola ve hash"];
+var D=[
+["Linux temelleri","ls","Dizin içeriğini listeler; izinleri ve gizli dosyaları görmek log/zafiyet avında ilk adımdır.",[["-l","uzun format: izin, sahip, boyut, tarih"],["-a","nokta ile başlayan gizli dosyaları da göster"],["-h","boyutları insan-okunur birimde göster (K, M, G)"]],["ls -lah /var/log"],"İzinlerde 'w' ile yazılabilir dosyalar yetki yükseltmede aranan ilk şeydir."],
+["Linux temelleri","grep","Dosyalarda veya başka bir komutun çıktısında desen arar; log analizinin bel kemiğidir.",[["-r","alt dizinlerde özyinelemeli ara"],["-i","büyük/küçük harfi önemseme"],["-n","eşleşen satır numarasını göster"]],["grep -rin \"failed password\" /var/log/auth.log","cat access.log | grep \" 404 \" | wc -l"],"İkinci örnek, bir web logundaki 404 sayısını sayar; ani artış tarama girişimine işaret edebilir."],
+["Linux temelleri","find","Ad, izin, tarih gibi kriterlere göre dosya arar.",[["-perm -4000","SUID biti set edilmiş dosyaları bul"],["-type f","yalnızca normal dosyalar"],["-mtime -7","son 7 günde değişenler"]],["find / -perm -4000 -type f 2>/dev/null"],"SUID’li beklenmedik bir dosya, yetki yükseltme için potansiyel bir yoldur."],
+["Linux temelleri","chmod / chown","Dosya izinlerini ve sahipliğini ayarlar; hassas dosyaları sınırlamak temel savunmadır.",[["600","sahibi okur+yazar, başkası erişemez"],["755","sahibi tam, diğerleri okur+çalıştırır"],["chown kullanıcı:grup","sahipliği değiştirir"]],["chmod 600 ~/.ssh/id_rsa","sudo chown root:root /etc/shadow"],"Özel anahtar dosyaları yalnızca sahibi tarafından okunabilmelidir."],
+["Linux temelleri","ps / ss","Çalışan süreçleri ve dinleyen ağ portlarını gösterir; hangi servisin dışa açık olduğunu ortaya çıkarır.",[["aux","tüm kullanıcıların tüm süreçleri"],["-tulpn","TCP/UDP dinleyen portlar, süreç adıyla birlikte"]],["ps aux --sort=-%mem | head","sudo ss -tulpn"],"ss çıktısında 0.0.0.0 ile dinleyen bir servis, dışarıya açık demektir."],
+["Linux temelleri","apt","Kali’yi güncel tutar ve yeni araç kurar; eski sürümler bilinen zafiyetler barındırabilir.",[["update","paket listesini yeniler"],["full-upgrade","kurulu tüm paketleri günceller"]],["sudo apt update && sudo apt full-upgrade -y","sudo apt install seclists"],"SecLists: tarama ve parola denemelerinde kullanılan hazır sözlük koleksiyonu."],
+["Ağ ve tarama","nmap: servis tespiti","Açık portları bulur ve her portta çalışan servisin sürümünü tahmin eder.",[["-sV","servis/sürüm tespiti"],["-p","belirli portları tara"],["-T4","tarama hız profili (0 yavaş-gizli, 5 hızlı)"]],["nmap -sV -T4 192.168.56.101","nmap -p 22,80,443 -sV 192.168.56.101"],"Sürüm bilgisi, bilinen CVE’lerle eşleştirmenin başlangıcıdır."],
+["Ağ ve tarama","nmap: tam tarama","Tüm 65535 portu tarar, varsayılan güvenli betikleri çalıştırır ve sonucu dosyaya kaydeder.",[["-p-","1-65535 arası tüm portlar"],["-sC","varsayılan NSE betik seti"],["-oN","çıktıyı okunabilir dosyaya yaz"]],["nmap -p- -sC -sV -oN tarama.txt 192.168.56.101"],"Tam tarama yavaştır; önce hızlı tarama ile öncelikli portları belirlemek daha pratiktir."],
+["Ağ ve tarama","nmap: zafiyet betikleri","NSE script motoruyla bilinen zafiyet imzalarını kontrol eder.",[["--script vuln","zafiyet odaklı betik kategorisi"]],["nmap --script vuln 192.168.56.101"],"Sonuçlar yanlış pozitif içerebilir; bulguları elle doğrulamadan rapora ekleme."],
+["Ağ ve tarama","netdiscover / arp-scan","Yerel ağdaki aktif cihazları ARP istekleriyle keşfeder.",[["-r","taranacak IP aralığı"],["--localnet","yerel ağ aralığını otomatik algıla"]],["sudo netdiscover -r 192.168.56.0/24","sudo arp-scan --localnet"],"Lab ağında hedefin IP’sini bulmanın en hızlı yoludur."],
+["Ağ ve tarama","tcpdump","Ağ arayüzünden geçen paketleri canlı yakalar; sonra Wireshark’ta derinlemesine incelenebilir.",[["-i","dinlenecek ağ arayüzü"],["-w","yakalanan paketleri dosyaya yaz"],["port 80","yalnızca 80 numaralı port trafiği"]],["sudo tcpdump -i eth0 port 80 -c 50","sudo tcpdump -i eth0 -w yakalama.pcap"],"Şifrelenmemiş protokollerde (HTTP, FTP) parolalar açık metin olarak görülebilir."],
+["Ağ ve tarama","netcat (nc)","Ham TCP/UDP bağlantıları kurar; port testinden basit dosya transferine kadar kullanılır.",[["-z","bağlantı kurmadan yalnızca tara"],["-v","ayrıntılı çıktı"],["-l","gelen bağlantıları dinle"],["-p","dinlenecek yerel port"]],["nc -zv 192.168.56.101 20-100","nc -lvnp 4444"],"İkinci örnek, lab içinde kontrollü bir dinleyici açar; gerçek ortamda izinsiz kullanılmamalı."],
+["Keşif (OSINT)","whois / dig","Alan adı kayıt sahibini ve DNS kayıtlarını sorgular.",[["dig ANY","tüm kayıt türlerini iste"],["+short","kısa biçimde sadece sonucu göster"],["MX","e-posta sunucusu kayıtları"]],["whois example.com","dig example.com ANY +noall +answer","dig MX example.com +short"],"DNS kayıtları, bir kurumun alt alan adı ve e-posta altyapısını ele verir."],
+["Keşif (OSINT)","theHarvester","Açık kaynaklardan (arama motorları) e-posta ve alt alan adı toplar.",[["-d","hedef alan adı"],["-b","kullanılacak kaynak (ör. duckduckgo)"],["-l","sonuç sayısı sınırı"]],["theHarvester -d example.com -b duckduckgo -l 100"],"Sadece kendi alan adın veya yazılı izinli kapsam için kullan."],
+["Keşif (OSINT)","amass","Pasif ve aktif yöntemlerle alt alan adlarını haritalar.",[["enum","alt alan keşif modu"],["-passive","hedefe doğrudan istek göndermeden, üçüncü taraf kaynaklardan derle"]],["amass enum -passive -d example.com"],"Pasif mod daha az iz bırakır ve izinsiz kapsam dışı hedeflerde dahi risksizdir."],
+["Keşif (OSINT)","whatweb","Web sitesinin kullandığı CMS, sunucu ve eklenti gibi teknolojileri tanır.",[["-v","ayrıntılı (sürüm dahil) çıktı"]],["whatweb -v http://192.168.56.101"],"Eski sürüm bilgisi, bilinen zafiyet aramasında ilk ipucudur."],
+["Web testleri","nikto","Web sunucusunda yanlış yapılandırma, eski yazılım ve tehlikeli dosyaları tarar.",[["-h","hedef host/URL"]],["nikto -h http://192.168.56.101"],"Gürültülü bir araçtır; üretim ortamında izlenir ve log’lara düşer."],
+["Web testleri","gobuster","Sözlük kullanarak gizli dizin ve dosyaları bulur.",[["dir","dizin bruteforce modu"],["-u","hedef URL"],["-w","kullanılacak sözlük dosyası"],["-x","denenecek dosya uzantıları"]],["gobuster dir -u http://192.168.56.101 -w /usr/share/wordlists/dirb/common.txt -x php,txt"],"Bulunan /admin veya /backup gibi dizinler sonraki adımın hedefi olur."],
+["Web testleri","ffuf","Yüksek hızlı web fuzzer; FUZZ anahtar kelimesi sözlükteki her değerle değiştirilir.",[["-u","FUZZ içeren hedef URL"],["-w","sözlük dosyası"],["-mc","yalnızca gösterilecek HTTP durum kodları"]],["ffuf -u http://192.168.56.101/FUZZ -w /usr/share/wordlists/dirb/common.txt -mc 200,301"],"-mc ile gürültüyü (404’leri) eleyip yalnızca anlamlı sonuçları görürsün."],
+["Web testleri","sqlmap","SQL enjeksiyon noktalarını otomatik tespit edip veritabanı bilgisini çıkarmayı dener.",[["-u","parametre içeren hedef URL"],["--batch","tüm sorulara varsayılan cevapla geç"],["--dbs","veritabanı adlarını listele"]],["sqlmap -u \"http://192.168.56.101/vuln.php?id=1\" --batch --dbs"],"Yalnızca DVWA gibi bilerek zafiyetli lab uygulamalarında çalıştır."],
+["Web testleri","curl","HTTP isteklerini elle oluşturup başlık ve gövdeyi incelemeyi sağlar.",[["-I","yalnızca yanıt başlıklarını getir"],["-s","ilerleme çubuğunu gizle (sessiz)"],["-X POST","HTTP metodunu belirt"],["-d","gönderilecek form verisi"]],["curl -I http://192.168.56.101","curl -s -X POST -d \"user=test\" http://192.168.56.101/login"],"Başlıklardaki sunucu/çatı bilgisi, keşif aşamasının bir parçasıdır."],
+["Parola ve hash","hashid","Bir hash dizisinin hangi algoritmayla üretilmiş olabileceğini tahmin eder.",[["(argüman yok)","hash değerini doğrudan verin"]],["hashid 5f4dcc3b5aa765d61d8327deb882cf99"],"Çıktı MD5 derse hashcat’te -m 0 modunu seçersin."],
+["Parola ve hash","john (John the Ripper)","Kendi test hash’lerini sözlük veya kaba kuvvet saldırısıyla çözmeyi dener.",[["--wordlist","kullanılacak sözlük dosyası"],["--show","kırılmış parolaları listele"]],["john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt","john --show hash.txt"],"rockyou.txt kullanılmadan önce 'gzip -d rockyou.txt.gz' ile açılmalıdır."],
+["Parola ve hash","hashcat","GPU hızlandırmalı, çok algoritmalı hash kırma aracı.",[["-m","hash tipi numarası (0 = MD5)"],["-a 0","sözlük tabanlı saldırı modu"]],["hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/rockyou.txt"],"Savunma tarafı: bcrypt/argon2 gibi yavaş hash fonksiyonları bu tür saldırıları zorlaştırır."],
+["Parola ve hash","hydra","Giriş formlarında zayıf parolaları test eden çevrimiçi kaba kuvvet aracı.",[["-l","tek kullanıcı adı"],["-P","parola sözlük dosyası"],["-t","eşzamanlı deneme sayısı"]],["hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://192.168.56.101 -t 4"],"Savunma: hesap kilitleme, fail2ban, anahtar tabanlı SSH girişi."]
+];
+var cat="Tümü",qv="",list=document.getElementById("list"),chips=document.getElementById("chips"),countEl=document.getElementById("count");
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function render(){
+ list.textContent="";var n=0;
+ D.forEach(function(r){
+  var flagtxt=r[3].map(function(f){return f[0]+" "+f[1]}).join(" ");
+  var hay=(r[1]+" "+r[2]+" "+r[4].join(" ")+" "+flagtxt).toLowerCase();
+  if((cat!=="Tümü"&&r[0]!==cat)||(qv&&hay.indexOf(qv)<0))return;
+  n++;var c=el("article","cmd"),h=el("div","head");
+  h.appendChild(el("h3",0,r[1]));h.appendChild(el("span","tag",r[0]));
+  c.appendChild(h);c.appendChild(el("p",0,r[2]));
+  if(r[3].length){var ul=el("ul","flags");
+   r[3].forEach(function(f){var li=document.createElement("li");var b=document.createElement("b");b.textContent=f[0];li.appendChild(b);li.appendChild(document.createTextNode(f[1]));ul.appendChild(li)});
+   c.appendChild(ul);
+  }
+  r[4].forEach(function(s){
+   var p=el("pre","code");p.appendChild(document.createTextNode(s));
+   var b=el("button","copy","Kopyala");b.type="button";
+   b.onclick=function(){try{navigator.clipboard.writeText(s).then(function(){b.textContent="Kopyalandı";setTimeout(function(){b.textContent="Kopyala"},1400)})}catch(e){b.textContent="Kopyalanamadı"}};
+   p.appendChild(b);c.appendChild(p);
+  });
+  c.appendChild(el("span","note",r[5]));list.appendChild(c);
+ });
+ countEl.textContent=n+" komut gösteriliyor";
+ if(!n)list.appendChild(el("div","empty","Eşleşen komut bulunamadı. Farklı bir arama dene."));
+}
+CATS.forEach(function(k){
+ var b=el("button","chip",k);b.type="button";b.setAttribute("aria-pressed",k===cat);
+ b.onclick=function(){cat=k;[].forEach.call(chips.children,function(x){x.setAttribute("aria-pressed",x===b)});render()};
+ chips.appendChild(b);
+});
+document.getElementById("q").oninput=function(e){qv=e.target.value.trim().toLowerCase();render()};
+document.getElementById("theme").onclick=function(){
+ var r=document.documentElement,dark=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);
+ r.setAttribute("data-theme",dark?"light":"dark");
+};
+[].forEach.call(document.querySelectorAll(".cmd .code .copy"),function(b){
+ var pre=b.parentElement,txt=pre.textContent.replace("Kopyala","").trim();
+ b.onclick=function(){try{navigator.clipboard.writeText(txt).then(function(){b.textContent="Kopyalandı";setTimeout(function(){b.textContent="Kopyala"},1400)})}catch(e){}};
+});
+var links=[].slice.call(document.querySelectorAll('#sidenav a,#topnav a'));
+var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);
+function onscroll(){
+ var y=window.scrollY+100,cur=secs[0];
+ secs.forEach(function(s){if(s.offsetTop<=y)cur=s});
+ links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+cur.id)});
+}
+document.addEventListener('scroll',onscroll,{passive:true});
+onscroll();
+render();
+
+var hdr=document.querySelector('header');
+function hdrShadow(){hdr.classList.toggle('scrolled',window.scrollY>8)}
+document.addEventListener('scroll',hdrShadow,{passive:true});
+hdrShadow();
+
+(function(){
+ var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ var cmd='nmap -sV 192.168.56.101',el=document.getElementById('typecmd');
+ if(!el)return;
+ if(reduced){el.textContent=cmd;document.getElementById('out1').classList.add('show');document.getElementById('out2').classList.add('show');return}
+ var i=0;
+ (function type(){
+  if(i<=cmd.length){el.textContent=cmd.slice(0,i);i++;setTimeout(type,45)}
+  else{
+   setTimeout(function(){document.getElementById('out1').classList.add('show')},200);
+   setTimeout(function(){document.getElementById('out2').classList.add('show')},500);
+   setTimeout(function(){var c=document.getElementById('caret');if(c)c.style.animation='none'},1800);
+  }
+ })();
+})();
+</script>
+</body>
+</html>
